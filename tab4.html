@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>	
+		<link rel="stylesheet" type="text/css" href="css/index.css"/>
+	</head>
+	<body>
+		<div id="b">
+			<button
+					class="btn"
+					v-for="item in navs"
+					v-bind:key = "item"
+					v-on:click="currentTab = item"
+					v-bind:class = "['btn-css',{active:currentTab == item}]"
+			>{{item}}</button>
+			<keep-alive>
+				<component class="box" :is="current"></component>
+			</keep-alive>
+		</div>
+		<script type="text/javascript">
+			Vue.component('tabs-nav',{
+				data:function(){
+					return {
+						posts:[
+							{
+								name:"navs-one",
+								context:"xxxxxxxxxxxxx"
+							},
+							{
+								name:"navs-two",
+								context:"yyyyyyyyyyyyy"
+							},
+							{
+								name:"navs-three",
+								context:"zzzzzzzzzzzzz"
+							}
+						],
+						selectedPost:null
+						
+					}
+				},
+				template:`
+				<div class = "navs-div">
+					<ul class = "navs-li">
+						<li
+							v-for = "navs in posts"
+							v-bind:key = "navs.name"
+							v-bind:class = "{ selected: navs === selectedPost }"
+							v-on:click = "selectedPost = navs"
+						>{{navs.name}}</li>
+					</ul>
+					<div class = "navs-text">
+						<div v-if = "selectedPost">
+							<p>{{selectedPost.name}}</p>
+							<div v-html = "selectedPost.context"></div>
+						</div>
+						<div v-else>
+							<h2>没有任何文章</h2>
+						</div>
+					</div>
+				</div>`
+			})
+			
+			
+			Vue.component('tabs-text',{
+				template: "<div>Archive component</div>"
+			})
+			
+			let vm = new Vue({
+				el:"#b",
+				data:{
+					currentTab:"nav",
+					navs:['nav','text']
+				},
+				computed:{
+					current(){
+						return 'tabs-'+this.currentTab.toLowerCase()
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

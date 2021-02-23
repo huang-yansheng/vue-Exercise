@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<!-- , { active: currentTab.name === tab.name } -->
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<style type="text/css">
+			.big{
+				width: 200px;
+				height: 100px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="b">
+			<button v-on:click="change">{{val}}</button>
+			<component class="big" :is = "val"></component>
+		</div>
+		<script type="text/javascript">
+			let componentA = {
+				template:`<div>我是AAAAA</div>`
+			}
+			let componentB = {
+				template:`<div>我是BBBBB</div>`
+			}
+			let componentC = {
+				template:`<div>我是CCCCC</div>`
+			}
+			let vm = new Vue({
+				el:"#b",
+				data:{
+					val:"componentA"
+				},
+				components:{
+					'componentA':componentA,
+					'componentB':componentB,
+					'componentC':componentC
+				},
+				methods:{
+					change(){
+						if(this.val == "componentA"){
+							 this.val = "componentB"
+						}else if(this.val == "componentB"){
+							 this.val = "componentC"
+						}else if(this.val == "componentC"){
+							 this.val = "componentA"
+						}
+					}
+				}
+			})
+			
+		</script>
+	</body>
+</html>

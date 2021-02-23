@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>	
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			#content{
+				display: flex;
+				justify-content: space-between;
+			}
+			#app{
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+				padding: 10px;
+				width: 1200px;
+				height: 500px;
+				margin: 20px auto;
+				border: 1px solid black;
+			}
+			.box{
+				display: flex;
+				flex-direction: column;
+				justify-content: space-around;
+				align-items: center;
+				width: 120px;
+				height: 150px;
+				margin-top: 10px;
+				border: 1px solid black;
+				cursor: pointer;
+			}
+			.btn{
+				border: 1px solid black;
+				padding: 2px 10px;
+				cursor: pointer;
+				font-size: 16px;
+			}
+			.btn:focus{
+				outline: 0;
+			}
+			.add{
+				width: 100%;
+				display: flex;
+				justify-content: space-around;
+			}
+			.total{
+				display: flex;
+				justify-content: space-between;
+				margin-top: 50px;
+			}
+			.things{
+				margin-left: 200px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div id = "content">
+				<goods :name = things[0].name :pr = things[0].pr v-on:update:num = "things[0].num = $event"></goods>
+				<goods :name = things[1].name :pr = things[1].pr v-on:update:num = "things[1].num = $event"></goods>
+				<goods :name = things[2].name :pr = things[2].pr v-on:update:num = "things[2].num = $event"></goods>
+				<goods :name = things[3].name :pr = things[3].pr v-on:update:num = "things[3].num = $event"></goods>
+				<goods :name = things[4].name :pr = things[4].pr v-on:update:num = "things[4].num = $event"></goods>
+			</div>
+			<div class="total">
+				<div class="things">
+					<span v-show="things[0].num">手机:{{things[0].num+'个'}}</span>
+					<span v-show="things[1].num">电脑:{{things[1].num+'个'}}</span>
+					<span v-show="things[2].num">平板:{{things[2].num+'个'}}</span>
+					<span v-show="things[3].num">电视剧:{{things[3].num+'个'}}</span>
+					<span v-show="things[4].num">空调:{{things[4].num+'个'}}</span>
+				</div>
+				<span>总价格:{{all}}</span>
+			</div>
+		</div>
+		<script type="text/javascript">
+			Vue.component('goods',{
+				data:function(){
+					return {
+						num:0,
+					}
+				},
+				props:{
+					name:{
+						type:String,
+						default:"商品名称"
+					},
+					pr:{
+						type:Number,
+						default:0
+					},
+				},
+				template:
+				`<div class = "box">
+					<p>{{name}}</p>
+					<div class = "add">
+						<button class="btn" @click = "reduce">-</button>
+						<span>{{num}}</span>
+						<button class="btn" @click = "add">+</button>
+					</div>
+					<div>
+						<span>{{price}}</span>
+					</div>
+				</div>`,
+				computed:{
+					price(){
+						return this.num*this.pr+'￥'
+					}
+				},
+				methods:{
+					add(){
+						this.num++
+						this.$emit('update:num',this.num)
+					},
+					reduce(){
+						if(this.num > 0){
+							this.num--
+							this.$emit('update:num',this.num)
+						}
+					}
+				}
+			})
+			let vm = new Vue({
+				el:"#app",
+				data:{
+					things:[
+						{
+							name:"手机",
+							num:0,
+							pr:8848
+						},
+						{
+							name:"电脑",
+							num:0,
+							pr:12000
+						},
+						{
+							name:"平板",
+							num:0,
+							pr:6666
+						},
+						{
+							name:"电视机",
+							num:0,
+							pr:5555
+						},
+						{
+							name:"空调",
+							num:0,
+							pr:3500
+						}
+					]
+				},
+				computed:{
+					all(){
+						let total = 0;
+						this.things.forEach(function(a,i){
+							total += a.num*a.pr
+						})
+						return total+'￥'
+					}
+				},
+				methods:{
+					add(){
+						this.num++
+					},
+					reduce(){
+						if(this.num > 0){
+							this.num--
+						}
+					}
+				}
+			})
+			console.log(vm.things[0].num)
+		</script>
+	</body>
+</html>

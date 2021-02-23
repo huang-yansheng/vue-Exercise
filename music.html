@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>axios</title>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>	
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+		<style type="text/css">
+			*,ul{
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			html,body,#app{
+				width: 100%;
+				height: 100%;
+			}
+			#app{
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background: url("https://i.loli.net/2020/03/23/gz9abCBAcphv6jF.jpg") no-repeat;
+			}
+			.box{
+				position: relative;
+				width: 900px;
+			}
+			header{
+				position: relative;
+				display: flex;
+				justify-content: space-between;
+				padding: 10px 20px;
+				line-height: 24px;
+				background-color: #4cc1ff;
+				z-index: 4;
+			}
+			.name{
+				color: white;
+				cursor: pointer;
+				vertical-align: middle;
+				font-size: 24px;
+			}
+			.musicName{
+				margin-left: 15px;
+			}
+			.fa-search{
+				font-size:16px;
+				color: #ccc;
+				background-color: #b2edff;
+				border-top-right-radius: 15px;
+				border-bottom-right-radius: 15px;
+				cursor: pointer;
+				padding: 7px;
+				vertical-align: top;
+				margin-left: -6px;
+			}
+			.fa-music,.fa-caret-square-o-right{
+				font-size: 16px;
+				color: #ff664b;
+			}
+			.fa-caret-square-o-right{
+				font-size: 20px;
+				color: #969696;
+				position: absolute;
+				right: 10px;
+			}
+			.fa-caret-square-o-right:hover{
+				color:#ff664b;
+				z-index: 10;
+			}
+			.search input{
+				height: 30px;
+				outline: 0;
+				border: 0;
+				background-color:#b2edff;
+				padding-left: 15px;
+				border-top-left-radius: 15px;
+				border-bottom-left-radius: 15px;
+			}
+			section{
+				display: flex;
+				font-size: 14px;
+				height: 450px;
+				background-color: rgba(255,255,255,0.5);
+			}
+			section .left,.right{
+				width: 29%;
+				padding: 10px;
+				overflow: auto;
+			}
+			/* 关闭滚动条 */
+			::-webkit-scrollbar { width: 0 !important }
+			
+			section li{
+				list-style: none;
+				cursor: pointer;
+				padding:15px 10px;
+			}
+			section .left li:nth-of-type(odd){
+				background-color: #fff8e6;
+				border-radius: 10px;
+			}
+			section .left li{
+				position: relative;
+			}
+			dl{
+				content: "";
+				display: table;
+				clear: both;
+				margin-top: 20px;
+			}
+			dt{
+				float: left;
+				width: 46px;
+				margin-right: 10px;
+			}
+			dd{
+				width: 72%;
+				float: left;
+				line-height: 24px;
+			}
+			dt img{
+				border-radius: 50%;
+				width: 46px;
+				height: 46px;
+			}
+			.nickname{
+				margin: 5px 0;
+				font-weight: 700;
+				font-size: 14px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			section .mid{
+				width: 42%;
+				position: relative;
+			}
+			.img1{
+				position: absolute;
+				top: -10px;
+				left: 55%;
+				transform-origin: left top;
+				transform: rotateZ(-15deg);
+				transition: all 2s;
+				z-index: 3;
+			}
+			.img2{
+				position: absolute;
+				top: 20%;
+				left: 16%;
+				z-index: 2;
+			}
+			.img3{
+				position: absolute;
+				width: 150px;
+				height: 150px;
+				top: 32%;
+				left: 28%;
+			}
+			footer{
+				background-color: #F1F3F4;
+			}
+			audio{
+				width: 100%;
+				outline: none;
+				border-radius: 1px;
+			}
+			@keyframes xz{
+				0%{
+					transform: rotateZ(0deg);
+				}
+				100%{
+					transform: rotateZ(360deg);
+				}
+			}
+			.dh{
+				animation: xz 5s 0.5s linear infinite;
+			}
+			.xz{
+				animation-play-state: paused;
+			}
+			.dh2{
+				transform: rotateZ(22deg);
+			}
+			/* 遮罩层 */
+			.mark{
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0,0,0,.7);
+				z-index: 5;
+			}
+			.mark video{
+				width: 800px;
+				height: 600px;
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				top: 0;
+				margin: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="box">
+				<header>
+					<span class="name">网抑云</span>
+					<div class="search">
+						<input v-model="val" @keyup.enter="search">
+						<i class="fa fa-search" @click="search"></i>
+					</div>
+				</header>
+				<section>
+					<ul class="left">
+						<li
+							v-for="items,index in music"
+							v-on:click="playMusic(items.id)"
+						>
+						<i class="fa fa-music"></i>
+						<i v-if="items.mvid" class="fa fa-caret-square-o-right" @click.stop="mvplay(items.mvid)"></i>
+						<span class="musicName">
+							{{items.name}}
+						</span>
+						</li>
+					</ul>
+					<div class="mid">
+							<img src="https://i.loli.net/2020/03/23/gZHko2WlpJNcGPv.png"class="img1" :class="{xz:start,dh2:animation2}">
+							<img src="https://i.loli.net/2020/03/23/hQPuH4gNRx7XayI.png" class="img2" :class="{xz:start,dh:animation}">
+							<img :src="musicImg" class="img3":class="{xz:start,dh:animation}" v-show="musicImg">
+					</div>
+					<div class="right" v-if="message">
+						<h4>热门留言</h4>
+						<dl v-for="texts,index in hotComments"
+							v-bind:key = "index"> 
+						    <dt><img :src = "texts.user.avatarUrl" alt=""></dt> 
+						    <dd class="nickname" :title="texts.user.nickname">{{texts.user.nickname}}</dd> 
+						    <dd>{{texts.content}}</dd> 
+						</dl> 
+					</div>
+				</section>
+				<footer>
+					<audio :src="src" controls="controls" @pause="pause" @play="play" autoplay="autoplay" ref = "audio">
+						当前浏览器不支持audio
+					</audio>
+				</footer>
+			</div>
+			<div class="mark" v-show="ismv" @click.self="closemv">
+				<video :src="mv" controls="controls" autoplay="autoplay">
+					
+				</video>
+			</div>
+		</div>
+		<script type="text/javascript">
+			//请求地址:https://autumnfish.cn/search
+			//请求方法:get
+			//请求参数:keywords(查询的关键字)
+			//响应的内容:歌曲搜索结果
+			
+			//请求地址:https://autumnfish.cn/song/url
+			//请求方法:get
+			//请求参数:id(歌曲id)
+			//响应的内容:歌曲的url
+			
+			//请求地址:https://autumnfish.cn/song/detail
+			//请求方法:get
+			//请求参数:ids(歌曲id)
+			//响应的内容:歌曲详情，包含封面信息
+			
+			//请求地址:https://autumnfish.cn/comment/hot?type=0
+			//请求方法:get
+			//请求参数:id(歌曲id，type固定为0)
+			//响应内容:歌曲的热门评论
+			
+			//https://autumnfish.cn/mv/url
+			//请求方法:get
+			//请求参数:id(mvid,为0说明没有)
+			//响应内容:MV的地址
+			let vm = new Vue({
+				el:"#app",
+				data:{
+					val:"",
+					music:[],
+					hotComments:[],
+					src:null,
+					musicImg:"",
+					userImg:"",
+					animation:false,
+					animation2:false,
+					start:true,
+					message:false,
+					ismv:false,
+					mv:"",
+					
+				},
+				methods:{
+					search(){
+						//获取this
+						let that = this;
+						//根据搜索内容请求歌曲库
+						axios.get('https://autumnfish.cn/search?keywords='+this.val)
+						.then(function(reponse){
+							console.log(reponse.data.result.songs)
+							that.music = reponse.data.result.songs
+						})
+					},
+					playMusic(id){
+						//获取this
+						let that = this
+						//每次切换歌曲时，歌曲封面动画重新开始旋转
+						this.animation = false;
+						//请求歌曲地址
+						axios.get('https://autumnfish.cn/song/url?id='+id)
+						.then(function(reponse){
+							that.src = reponse.data.data[0].url
+						})
+						//请求歌曲对应图片地址
+						axios.get('https://autumnfish.cn/song/detail?ids='+id)
+						.then(function(reponse){
+							that.musicImg = reponse.data.songs[0].al.picUrl
+						}).then(function(reponse){
+							//歌曲封面动画开始旋转
+							that.animation = true;
+						})
+						//歌曲评论获取
+						axios.get('https://autumnfish.cn/comment/hot?type=0&id='+id)
+						.then(function(reponse){
+							that.hotComments = reponse.data.hotComments
+							that.message = true;
+						})
+						
+					},
+					pause(){
+						//动画启动暂停
+						this.start = true;
+						this.animation2 = false;
+					},
+					play(){
+						//动画取消暂停，重新开始
+						this.start = false;
+						//
+						this.animation2 = true;
+					},
+					//打开MV
+					mvplay(mvid){
+						let that = this;
+						this.ismv = true;
+						//$refs直接操作DOM，让其关闭
+						this.$refs.audio.pause();
+						axios.get('https://autumnfish.cn/mv/url?id='+mvid)
+						.then(function(reponse){
+							that.mv = reponse.data.data.url
+						})
+						
+					},
+					//关闭MV
+					closemv(){
+						this.ismv = false
+						this.mv = "";
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

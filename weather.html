@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>axios</title>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>	
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<style type="text/css">
+			*,ul{
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			#app{
+				overflow: hidden;
+			}
+			.box{
+				width: 800px;
+				height: 500px;
+				margin: 20px auto;
+			}
+			input{
+				width: 600px;
+				height: 36px;
+				padding-left: 5px;
+				outline: 0;
+				vertical-align: top;
+			}
+			.search{
+				font-size: 12px;
+				padding: 8px 15px;
+				margin-left: -6px;
+				cursor: pointer;
+			}
+			.choice,.information{
+				display: flex;
+				font-size: 12px;
+			}
+			li{
+				list-style: none;
+				padding: 2px 5px;
+				cursor: pointer;
+			}
+			footer{
+				margin-top: 50px;
+			}
+			.information{
+				width: 700px;
+				justify-content: space-around;
+			}
+			.information li{
+				text-align: center;
+				border-right: 1px solid #ccc;
+			}
+			.information li p{
+				margin-bottom: 10px;
+			}
+			.head{
+				font-size: 18px;
+				color: #ffcc00;
+			}
+			.sec{
+				font-size: 12px;
+				color: #ffcc00;
+			}
+			.foot{
+				font-size: 12px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="box">
+				<header>
+					<input type="text" v-model="val" v-on:keyup.enter = "query">
+					<button v-on:click = "query" class="search">搜索</button>
+					<ul class="choice">
+						<li v-for="item,index in city"
+							:key = "index"
+							v-on:click="add(item)"
+						>
+							{{item}}
+						</li>
+					</ul>
+				</header>
+				<footer>
+					<ul class="information" v-show="mess.length > 0">
+						<li v-for="mes in mess"
+							
+							>
+							<p class="head">{{mes.type}}</p>
+							<p class="sec">{{mes.low+'~'+mes.high}}</p>
+							<p class="foot">{{mes.date}}</p>
+						</li>
+					</ul>
+				</footer>
+			</div>
+		</div>
+		<script type="text/javascript">
+			// 请求地址:http://wthrcdn.etouch.cn/weather_mini
+			// 请求方法:get,
+			// 请求参数:city(查询的城市名字)
+			// 响应内容:天气信息
+			let vm = new Vue({
+				el:"#app",
+				data:{
+					city:['北京','上海','广州','深圳'],
+					mess:[],
+					val : ""
+				},
+				methods:{
+					add(item){
+						this.val = item
+						this.query();
+					},
+					query(){
+						let that = this;
+						axios.get('http://wthrcdn.etouch.cn/weather_mini?city='+this.val)
+						.then(function(response){
+							that.mess = response.data.data.forecast;
+						}).catch(function(err){
+							console.log("查询出错"+err)
+						})
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

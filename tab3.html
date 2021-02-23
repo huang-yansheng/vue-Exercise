@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>keep-alive</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/style.css"/>
+  </head>
+  <body>
+    <div id="app">
+      <button
+        v-for="tab in tabs"
+        v-bind:key="tab"
+        v-bind:class="['tab-button', { active: currentTab === tab }]"
+        v-on:click="currentTab = tab"
+      >
+        {{ tab }}
+      </button>
+
+      <keep-alive>
+        <component v-bind:is="currentTabComponent" class="tab"></component>
+      </keep-alive>
+    </div>
+
+    <script>
+      Vue.component("tab-posts", {
+        data: function() {
+          return {
+            posts: [
+              {
+                id: 1,
+                title: "选项一",
+                content:"内容一"
+              },
+              {
+                id: 2,
+                title: "选项二",
+                content:"内容二"
+              },
+              {
+                id: 3,
+                title: "选项三",
+                content:"内容三"
+              }
+            ],
+            selectedPost: null
+          };
+        },
+        template: `
+  	<div class="posts-tab">
+      <ul class="posts-sidebar">
+        <li
+          v-for="post in posts"
+          v-bind:key="post.id"
+          v-bind:class="{ selected: post === selectedPost }"
+					v-on:click="selectedPost = post"
+        >
+          {{ post.title }}
+        </li>
+      </ul>
+      <div class="container">
+      	<div 
+        	v-if="selectedPost"
+          class="selected-post"
+        >
+          <h3>{{ selectedPost.title }}</h3>
+          <div v-html="selectedPost.content"></div>
+        </div>
+        <strong v-else>
+          点击切换次级目录
+        </strong>
+      </div>
+    </div>
+  `
+      });
+
+      Vue.component("tab-archive", {
+        template: "<div>主要内容</div>"
+      });
+
+      new Vue({
+        el: "#app",
+        data: {
+          currentTab: "Posts",
+          tabs: ["Posts", "Archive"]
+        },
+        computed: {
+          currentTabComponent: function() {
+            return "tab-" + this.currentTab.toLowerCase();
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
